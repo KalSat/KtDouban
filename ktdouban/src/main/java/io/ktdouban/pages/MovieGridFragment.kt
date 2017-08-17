@@ -8,11 +8,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.google.gson.Gson
+import io.ktdouban.BR
 import io.ktdouban.R
 import io.ktdouban.data.DataStore
 import io.ktdouban.data.entities.Movie
 import io.ktdouban.databinding.FragmentMovieGridBinding
+import me.tatarka.bindingcollectionadapter2.ItemBinding
 import rx.Subscription
+import rx.android.schedulers.AndroidSchedulers
 import rx.lang.kotlin.subscribeBy
 import rx.schedulers.Schedulers
 
@@ -24,8 +28,11 @@ import rx.schedulers.Schedulers
 class MovieGridFragment : Fragment() {
     // binding data
     var movieList: ObservableArrayList<Movie> = ObservableArrayList()
+    var movieStringList: ObservableArrayList<String> = ObservableArrayList()
+    var itemBinding: ItemBinding<String> = ItemBinding.of(BR.item, R.layout.item_movie_grid)
     // other field
     private lateinit var subscription: Subscription
+    var gson = Gson()
 
     companion object {
         fun newInstance(): MovieGridFragment {
@@ -66,12 +73,19 @@ class MovieGridFragment : Fragment() {
                 .filter {
                     it != null && it.subjects.count() > 0
                 }
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                         onNext = {
                             if (movieList.isNotEmpty()) {
                                 movieList.clear()
                             }
                             movieList.addAll(it.subjects)
+                            if (movieStringList.isNotEmpty()) {
+                                movieStringList.clear()
+                            }
+                            for (movie in movieList) {
+                                movieStringList.add(gson.toJson(movie))
+                            }
                         },
                         onError = {
                             it.printStackTrace()
