@@ -1,7 +1,6 @@
 package io.ktdouban.pages
 
 import android.databinding.DataBindingUtil
-import android.databinding.ObservableArrayList
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -15,6 +14,7 @@ import io.ktdouban.data.DataStore
 import io.ktdouban.data.entities.Movie
 import io.ktdouban.databinding.FragmentMovieGridBinding
 import me.tatarka.bindingcollectionadapter2.ItemBinding
+import me.tatarka.bindingcollectionadapter2.collections.DiffObservableList
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.lang.kotlin.subscribeBy
@@ -27,12 +27,19 @@ import rx.schedulers.Schedulers
  */
 class MovieGridFragment : Fragment() {
     // binding data
-    var movieList: ObservableArrayList<Movie> = ObservableArrayList()
-    var movieStringList: ObservableArrayList<String> = ObservableArrayList()
-    var itemBinding: ItemBinding<String> = ItemBinding.of(BR.item, R.layout.item_movie_grid)
+    var movieList: DiffObservableList<Movie> = DiffObservableList(object : DiffObservableList.Callback<Movie> {
+        override fun areItemsTheSame(oldItem: Movie?, newItem: Movie?): Boolean {
+            return oldItem?.id == newItem?.id
+        }
+
+        override fun areContentsTheSame(oldItem: Movie?, newItem: Movie?): Boolean {
+            return oldItem == newItem
+        }
+    })
+    var itemBinding = ItemBinding.of<Movie>(BR.item, R.layout.item_movie_grid)
+            .bindExtra(BR.gson, Gson())
     // other field
     private lateinit var subscription: Subscription
-    var gson = Gson()
 
     companion object {
         fun newInstance(): MovieGridFragment {
@@ -73,19 +80,13 @@ class MovieGridFragment : Fragment() {
                 .filter {
                     it != null && it.subjects.count() > 0
                 }
+                .map {
+                    Pair(it.subjects, movieList.calculateDiff(it.subjects))
+                }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                         onNext = {
-                            if (movieList.isNotEmpty()) {
-                                movieList.clear()
-                            }
-                            movieList.addAll(it.subjects)
-                            if (movieStringList.isNotEmpty()) {
-                                movieStringList.clear()
-                            }
-                            for (movie in movieList) {
-                                movieStringList.add(gson.toJson(movie))
-                            }
+                            movieList.update(it.first, it.second)
                         },
                         onError = {
                             it.printStackTrace()

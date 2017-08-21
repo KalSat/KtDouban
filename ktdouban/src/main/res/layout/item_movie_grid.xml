@@ -5,7 +5,11 @@
 
         <variable
             name="item"
-            type="String"/>
+            type="io.ktdouban.data.entities.Movie"/>
+
+        <variable
+            name="gson"
+            type="com.google.gson.Gson"/>
     </data>
 
     <LinearLayout
@@ -19,8 +23,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:lines="4"
             android:ellipsize="end"
-            android:text="@{item}"/>
+            android:lines="4"
+            android:text="@{gson.toJson(item)}"/>
     </LinearLayout>
 </layout>

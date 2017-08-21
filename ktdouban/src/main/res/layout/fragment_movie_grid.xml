@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:itemBinding="@{vm.itemBinding}"
-            app:items="@{vm.movieStringList}"
+            app:items="@{vm.movieList}"
             app:layoutManager="@{LayoutManagers.linear()}"/>
     </RelativeLayout>
 </layout>
