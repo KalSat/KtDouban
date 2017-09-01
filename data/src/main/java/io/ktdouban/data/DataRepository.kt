@@ -2,6 +2,7 @@ package io.ktdouban.data
 
 import android.content.Context
 import android.util.Log
+import com.anupcowkur.reservoir.Reservoir
 import com.meizu.fetchmoviekt.utils.NetUtils
 import io.ktdouban.data.entities.Address
 import io.ktdouban.data.entities.MovieCollectionPage
@@ -31,6 +32,7 @@ object DataRepository {
     fun onCreate(context: Context) {
         mContext = context
         initNetwork()
+        Reservoir.init(mContext, (5 * 1024 * 1024).toLong())
     }
 
     fun onDestroy() {
