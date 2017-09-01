@@ -5,15 +5,14 @@
 
         <variable
             name="item"
-            type="io.ktdouban.data.entities.Movie"/>
+            type="io.ktdouban.data.entities.Movie" />
 
         <variable
             name="gson"
-            type="com.google.gson.Gson"/>
+            type="com.google.gson.Gson" />
     </data>
 
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -25,6 +24,6 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:lines="4"
-            android:text="@{gson.toJson(item)}"/>
+            android:text="@{gson.toJson(item)}" />
     </LinearLayout>
 </layout>

@@ -32,7 +32,7 @@ import android.text.TextUtils
  * Blog : http://blog.csdn.net/u011240877
  * checked
  */
-object NetUtils {
+internal object NetUtils {
 
     val NETWORK_TYPE_WIFI = "wifi"
     val NETWORK_TYPE_3G = "3g"

@@ -18,7 +18,7 @@ import rx.subjects.Subject
 /**
  * Created by chengbiao on 2016/6/15.
  */
-object LocationHelper {
+internal object LocationHelper {
 
     fun getLocation(context: Context): Observable<Location> {
         val rxBus: Subject<Location, Location> = SerializedSubject(PublishSubject.create())

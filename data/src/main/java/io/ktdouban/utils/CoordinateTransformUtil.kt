@@ -19,7 +19,7 @@ package io.ktdouban.utils
 /**
  * https://github.com/wandergis/coordtransform javaScript Version
  */
-object CoordinateTransformUtil {
+internal object CoordinateTransformUtil {
     internal var x_pi = 3.14159265358979324 * 3000.0 / 180.0
     internal var pi = 3.1415926535897932384626
     internal var a = 6378245.0

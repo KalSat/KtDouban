@@ -5,7 +5,7 @@ import java.util.*
 /**
  * Created by chengbiao on 17/8/9.
  */
-open class EntitiesPage<T> {
+internal open class EntitiesPage<T> {
 
     var total: Int = 0
 

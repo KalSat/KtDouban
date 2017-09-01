@@ -1,20 +1,18 @@
 package io.ktdouban
 
 import android.app.Application
-import android.content.Context
+import io.ktdouban.data.DataRepository
 
 /**
  * Created by chengbiao on 17/8/10.
  */
 class App : Application() {
 
-    companion object {
-        internal lateinit var context: Context
-    }
+    private val dataRepo = DataRepository
 
     override fun onCreate() {
         super.onCreate()
-        context = applicationContext
+        dataRepo.onCreate(applicationContext)
     }
 
     override fun onLowMemory() {
@@ -27,6 +25,7 @@ class App : Application() {
 
     override fun onTerminate() {
         super.onTerminate()
+        dataRepo.onDestroy()
     }
 
 }

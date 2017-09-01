@@ -1,6 +1,6 @@
-package io.ktdouban.data
+package io.ktdouban.data.network
 
-import io.ktdouban.data.entities.MovieList
+import io.ktdouban.data.entities.MovieCollectionPage
 
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -9,7 +9,7 @@ import rx.Observable
 /**
  * Created by chengbiao on 16-3-31.
  */
-interface DoubanRepository {
+internal interface DoubanDataSource {
 
     companion object {
         val BASE_URL = "https://api.douban.com/v2/"
@@ -17,6 +17,6 @@ interface DoubanRepository {
     }
 
     @GET("movie/in_theaters")
-    fun getMoviesInTheater(@Query("city") city: String, @Query("apikey") key: String): Observable<MovieList>
+    fun getMoviesInTheater(@Query("city") city: String, @Query("apikey") key: String): Observable<MovieCollectionPage>
 
 }

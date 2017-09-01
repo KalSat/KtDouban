@@ -1,4 +1,4 @@
-package io.ktdouban.data
+package io.ktdouban.data.network
 
 import io.ktdouban.data.entities.Address
 
@@ -9,7 +9,7 @@ import rx.Observable
 /**
  * Created by chengbiao on 16-3-31.
  */
-interface GoogleMapRepository {
+internal interface GoogleMapDataSource {
 
     companion object {
         val BASE_URL = "http://maps.googleapis.com/maps/api/geocode/"

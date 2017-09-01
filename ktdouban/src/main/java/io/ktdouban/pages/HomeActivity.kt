@@ -1,15 +1,15 @@
 package io.ktdouban.pages
 
+import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import io.ktdouban.R
-import kotlinx.android.synthetic.main.activity_home.*
+import io.ktdouban.databinding.ActivityHomeBinding
 
 class HomeActivity : AppCompatActivity() {
 
@@ -25,18 +25,16 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
+        val binding: ActivityHomeBinding = DataBindingUtil.setContentView(this, R.layout.activity_home)
 
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
 
         // Set up the ViewPager with the sections adapter.
-        viewPagerContainer.adapter = mSectionsPagerAdapter
-        tabs.setupWithViewPager(viewPagerContainer)
-
+        binding.viewPagerContainer.adapter = mSectionsPagerAdapter
+        binding.tabs.setupWithViewPager(binding.viewPagerContainer)
     }
 
 
