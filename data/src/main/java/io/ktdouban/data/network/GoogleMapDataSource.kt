@@ -1,10 +1,9 @@
 package io.ktdouban.data.network
 
 import io.ktdouban.data.entities.Address
-
+import io.reactivex.Observable
 import retrofit2.http.GET
 import retrofit2.http.Query
-import rx.Observable
 
 /**
  * Created by chengbiao on 16-3-31.

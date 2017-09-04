@@ -2,9 +2,8 @@ package io.ktdouban.data.processor
 
 import io.ktdouban.data.DataRepository
 import io.ktdouban.data.entities.MovieCollection
-import io.ktdouban.data.entities.MovieCollectionPage
-import rx.Observable
-import rx.schedulers.Schedulers
+import io.reactivex.Observable
+import io.reactivex.functions.Function4
 
 /**
  * Created by steve on 17/8/26.
@@ -13,22 +12,29 @@ class MovieCollectionsProcessor(dataRepo: DataRepository) {
 
     private val mDataRepo = dataRepo
 
-    private var mMovieCollectionPage = MovieCollectionPage()
-
-    fun getInTheaterMovieCollection(): Observable<MovieCollection> {
-        return mDataRepo.getMoviesInTheater("北京")
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .filter {
-                    mMovieCollectionPage = it
-                    it != null && it.subjects.count() > 0
+    fun getMovieCollections(): Observable<ArrayList<MovieCollection>> {
+        return Observable.zip(
+                mDataRepo.getMoviesWeekly().map { it.toModel() },
+                mDataRepo.getMoviesNew().map { it.toModel() },
+                mDataRepo.getMoviesInTheater().map { it.toModel() },
+                mDataRepo.getMoviesComingSoon().map { it.toModel() },
+                Function4 { s1, s2, s3, s4 ->
+                    val movieCollections = ArrayList<MovieCollection>()
+                    if (s1.movies.isNotEmpty()) {
+                        movieCollections.add(s1)
+                    }
+                    if (s2.movies.isNotEmpty()) {
+                        movieCollections.add(s2)
+                    }
+                    if (s3.movies.isNotEmpty()) {
+                        movieCollections.add(s3)
+                    }
+                    if (s4.movies.isNotEmpty()) {
+                        movieCollections.add(s4)
+                    }
+                    movieCollections
                 }
-                .map {
-                    val movieCollection = MovieCollection()
-                    movieCollection.title = it.title
-                    movieCollection.movies = it.subjects
-                    movieCollection
-                }
+        )
     }
 
 }

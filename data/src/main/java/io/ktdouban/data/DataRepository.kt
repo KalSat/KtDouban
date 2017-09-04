@@ -5,17 +5,19 @@ import android.util.Log
 import com.anupcowkur.reservoir.Reservoir
 import com.meizu.fetchmoviekt.utils.NetUtils
 import io.ktdouban.data.entities.Address
+import io.ktdouban.data.entities.Movie
 import io.ktdouban.data.entities.MovieCollectionPage
 import io.ktdouban.data.network.DoubanDataSource
 import io.ktdouban.data.network.GoogleMapDataSource
+import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
 import okhttp3.Cache
 import okhttp3.CacheControl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import rx.Observable
 import java.io.File
 
 /**
@@ -39,7 +41,7 @@ object DataRepository {
     }
 
     private fun initNetwork() {
-        val mCacheControlInterceptor = Interceptor { chain ->
+        val cacheControlInterceptor = Interceptor { chain ->
             var request = chain.request()
             val networkAvailable = NetUtils.isNetworkAvailable(mContext)
             if (!networkAvailable) {
@@ -63,7 +65,7 @@ object DataRepository {
                         .build()
             }
         }
-        val mLogInterceptor = Interceptor { chain ->
+        val logInterceptor = Interceptor { chain ->
             val request = chain.request()
             val t1 = System.nanoTime()
             Log.i(TAG, String.format("Sending request %s on %s%n%s",
@@ -75,9 +77,9 @@ object DataRepository {
             response
         }
         val mClient = OkHttpClient.Builder()
-//                .addInterceptor(mCacheControlInterceptor)
-//                .addNetworkInterceptor(mCacheControlInterceptor)
-//                .addInterceptor(mLogInterceptor)
+//                .addInterceptor(cacheControlInterceptor)
+//                .addNetworkInterceptor(cacheControlInterceptor)
+//                .addInterceptor(logInterceptor)
                 .cache(Cache(File(mContext.externalCacheDir,
                         "responses"), (10 * 1024 * 1024).toLong()))
                 .build()
@@ -85,14 +87,14 @@ object DataRepository {
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(GoogleMapDataSource.BASE_URL)
                 .client(mClient)
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(GoogleMapDataSource::class.java)
         mDoubanNetwork = Retrofit.Builder()
                 .baseUrl(DoubanDataSource.BASE_URL)
                 .client(mClient)
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(DoubanDataSource::class.java)
@@ -100,8 +102,37 @@ object DataRepository {
 
     fun getAddress(latitude: Double, longitude: Double): Observable<Address> =
             mGoogleMapNetwork.getAddress(latitude.toString() + "," + longitude, "zh-CN", true)
+                    .subscribeOn(Schedulers.io())
 
-    internal fun getMoviesInTheater(city: String): Observable<MovieCollectionPage> =
+    internal fun getMoviesInTheater(city: String = "北京"): Observable<MovieCollectionPage> =
             mDoubanNetwork.getMoviesInTheater(city, DoubanDataSource.API_KEY)
+                    .subscribeOn(Schedulers.io())
 
+    internal fun getMoviesComingSoon(start: Int = 0, count: Int = 20): Observable<MovieCollectionPage> =
+            mDoubanNetwork.getMoviesComingSoon(start, count, DoubanDataSource.API_KEY)
+                    .subscribeOn(Schedulers.io())
+
+    internal fun getMoviesWeekly(): Observable<MovieCollectionPage> =
+            mDoubanNetwork.getMoviesWeekly(DoubanDataSource.API_KEY)
+                    .subscribeOn(Schedulers.io())
+
+    internal fun getMoviesNew(): Observable<MovieCollectionPage> =
+            mDoubanNetwork.getMoviesNew(DoubanDataSource.API_KEY)
+                    .subscribeOn(Schedulers.io())
+
+    internal fun getMoviesUs(): Observable<MovieCollectionPage> =
+            mDoubanNetwork.getMoviesUs(DoubanDataSource.API_KEY)
+                    .subscribeOn(Schedulers.io())
+
+    internal fun getMoviesTop250(start: Int = 0, count: Int = 20): Observable<MovieCollectionPage> =
+            mDoubanNetwork.getMoviesTop250(start, count, DoubanDataSource.API_KEY)
+                    .subscribeOn(Schedulers.io())
+
+    fun getMovie(id: Int): Observable<Movie> =
+            mDoubanNetwork.getMovie(id, DoubanDataSource.API_KEY)
+                    .subscribeOn(Schedulers.io())
+
+    internal fun searchMovie(keyword: String, start: Int = 0, count: Int = 20): Observable<MovieCollectionPage> =
+            mDoubanNetwork.searchMovies(keyword, "", start, count, DoubanDataSource.API_KEY)
+                    .subscribeOn(Schedulers.io())
 }

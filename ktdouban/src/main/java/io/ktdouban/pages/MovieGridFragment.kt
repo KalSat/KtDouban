@@ -14,11 +14,11 @@ import io.ktdouban.data.DataRepository
 import io.ktdouban.data.entities.Movie
 import io.ktdouban.data.processor.MovieCollectionsProcessor
 import io.ktdouban.databinding.FragmentMovieGridBinding
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.subscribeBy
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 import me.tatarka.bindingcollectionadapter2.collections.DiffObservableList
-import rx.Subscription
-import rx.android.schedulers.AndroidSchedulers
-import rx.lang.kotlin.subscribeBy
 
 /**
  * A simple [Fragment] subclass.
@@ -38,7 +38,7 @@ class MovieGridFragment : Fragment() {
             .bindExtra(BR.gson, Gson())
     // other field
     private lateinit var mDataRepo: MovieCollectionsProcessor
-    private lateinit var subscription: Subscription
+    private val disposable = CompositeDisposable()
 
     companion object {
         fun newInstance(): MovieGridFragment {
@@ -69,15 +69,13 @@ class MovieGridFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (!subscription.isUnsubscribed) {
-            subscription.unsubscribe()
-        }
+        disposable.clear()
     }
 
     private fun loadData() {
-        subscription = mDataRepo.getInTheaterMovieCollection()
+        disposable.add(mDataRepo.getMovieCollections()
                 .map {
-                    Pair(it.movies, movieList.calculateDiff(it.movies))
+                    Pair(it[0].movies, movieList.calculateDiff(it[0].movies))
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
@@ -89,7 +87,7 @@ class MovieGridFragment : Fragment() {
                             Toast.makeText(context, "can't get movies",
                                     Toast.LENGTH_SHORT).show()
                         }
-                )
+                ))
     }
 
 }// Required empty public constructor
